@@ -14,13 +14,12 @@ class GeneratingQueryService{
     private $responseOrElements = [];
 
     public function execute(array $request){
-        // $this->responseQuery = collect();
 
-        // $content = file_get_contents($request['input']->);
         $content = file_get_contents($request['input']->getRealPath() );
-        $content = json_decode( $content, true) ;
-        foreach ($content as  $query) {
-            $this->buildQuery2($query);
+
+        $queryConditions = json_decode( $content, true) ;
+        foreach ($queryConditions as  $condition) {
+            $this->buildQuery2($condition);
         }
 
         if($this->responseOrElements){
@@ -35,7 +34,9 @@ class GeneratingQueryService{
         return $this->responseQuery;
     }
 
-
+    /**
+     * append To Response Query
+     */
     private function buildQuery2($query){
         $this->responseElement = [
             $query['column'] => [
@@ -98,64 +99,4 @@ class GeneratingQueryService{
 
     }
 
-    /**
-     * append To Response Query
-     */
-    private function buildQuery($query){
-        // $this->responseQuery[] ;
-        if($query['sub_operation'] == SubOperatorEnum::AND ){
-            $opeartionKey = SubOperatorEnum::OPERATION_MAPPING[$query['sub_operation']];
-            if(key_exists(SubOperatorEnum::OPERATION_MAPPING['or'], $this->responseQuery) ){
-                end($this->responseQuery[SubOperatorEnum::OPERATION_MAPPING['or']]);
-                $lasOrKey = key($this->responseQuery[SubOperatorEnum::OPERATION_MAPPING['or']]);
-
-                $this->responseQuery[SubOperatorEnum::OPERATION_MAPPING['or']][$lasOrKey][SubOperatorEnum::OPERATION_MAPPING['and']][] = [
-                    $query['column'] => [
-                        OperatorEnum::OPERATION_MAPPING[$query['operation']] => $query['value'][0]
-                    ]
-                    // $query['column'][$query[OperatorEnum::OPERATION_MAPPING[$query['operation']]] ] => $query['value'][0]
-                ];
-            }
-            else{
-                $this->responseQuery[SubOperatorEnum::OPERATION_MAPPING['and']][] = [
-                    $query['column'] => [
-                        OperatorEnum::OPERATION_MAPPING[$query['operation']] => $query['value'][0]
-                    ]
-                    // $query['column'][$query[OperatorEnum::OPERATION_MAPPING[$query['operation']]] ] => $query['value'][0]
-                ];
-                // $this->responseQuery[$opeartionKey][] = $condition;
-            }
-
-        }
-        elseif($query['sub_operation'] == SubOperatorEnum::OR){
-            $opeartionKey = SubOperatorEnum::OPERATION_MAPPING[$query['sub_operation']];
-            if(key_exists($opeartionKey, $this->responseQuery) ){
-                end($this->responseQuery[$opeartionKey]);
-                $lastOrKey = key($this->responseQuery[$opeartionKey]);
-
-                $this->responseQuery[$opeartionKey][$lastOrKey][SubOperatorEnum::OPERATION_MAPPING['and']][] = [
-                    $query['column'] => [
-                        OperatorEnum::OPERATION_MAPPING[$query['operation']] => $query['value'][0]
-                    ]
-                ];
-            }
-            else{
-                $currentContent = $this->responseQuery;
-                // dd($currentContent);
-                $this->responseQuery = [];
-                $this->responseQuery[$opeartionKey] = $currentContent; 
-
-                $this->responseQuery[$opeartionKey][SubOperatorEnum::OPERATION_MAPPING['and']][] = [
-                    // SubOperatorEnum::OPERATION_MAPPING['and'] => [
-                        $query['column'] => [
-                            OperatorEnum::OPERATION_MAPPING[$query['operation']] => $query['value'][0]
-                        ]
-                    // ]
-                ];
-            }
-        }
-        // elseif($query['sub_operation'] == null){
-
-        // }
-    }
 }
