@@ -1,0 +1,25 @@
+[{
+	"column": "first_name",
+	"operation": "is_equal",
+	"value": ["Reda"],
+	"sub_operation": "and",
+	"id": "1554280538826"
+}, {
+	"column": "gender",
+	"operation": "not_equal",
+	"value": ["male"],
+	"sub_operation": "or",
+	"id": "1554280651661"
+}, {
+	"column": "last_name",
+	"operation": "is_equal",
+	"value": ["Ali"],
+	"sub_operation": "and",
+	"id": "1554280672204"
+}, {
+	"column": "gender",
+	"operation": "is_equal",
+	"value": ["female"],
+	"sub_operation": null,
+	"id": "1554280714633"
+}]

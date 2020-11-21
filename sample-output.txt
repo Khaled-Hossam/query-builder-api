@@ -1,0 +1,23 @@
+{
+	"$or": [{
+		"$and": [{
+			"first_name": {
+				"$eq": "Reda"
+			}
+		}, {
+			"gender": {
+				"$ne": "male"
+			}
+		}]
+	}, {
+		"$and": [{
+			"last_name": {
+				"$eq": "ALI"
+			}
+		}, {
+			"gender": {
+				"$eq": "female"
+			}
+		}]
+	}]
+}

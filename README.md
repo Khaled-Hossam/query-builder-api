@@ -82,7 +82,12 @@ Body form-data
 
 key : input
 
-value : the uploaded file that contains the filtertion criteria
+value : the uploaded file that contains the filtration criteria
+
+
+example for input [sample input](sample-input.txt)
+
+expected output would be like [sample output](sample-output.txt)
 
 ----------
 
