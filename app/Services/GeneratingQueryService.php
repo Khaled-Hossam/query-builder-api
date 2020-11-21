@@ -18,10 +18,23 @@ class GeneratingQueryService{
         $content = file_get_contents($request['input']->getRealPath() );
 
         $queryConditions = json_decode( $content, true) ;
-        foreach ($queryConditions as  $condition) {
-            $this->buildQuery2($condition);
+        // if file doesn't decoded successfuly, so it doesn't have valid data
+        if(!$queryConditions){
+            return false;
+        }
+        // if first element is array, so there is more than one condition,
+        // else, there is only one condition
+        $keys = array_keys($queryConditions);
+        if(is_array($queryConditions[$keys[0]])){
+            foreach ($queryConditions as  $condition) {
+                $this->buildQuery($condition);
+            }
+        }
+        else{
+            $this->buildQuery($queryConditions);
         }
 
+        // the final reponse query
         if($this->responseOrElements){
             $this->responseQuery = $this->responseOrElements;
         }
@@ -31,72 +44,73 @@ class GeneratingQueryService{
         else{
             $this->responseQuery = $this->responseElement;
         }
+
         return $this->responseQuery;
     }
 
     /**
-     * append To Response Query
+     * process the condition, and update response data
      */
-    private function buildQuery2($query){
+    private function buildQuery($condition){
         $this->responseElement = [
-            $query['column'] => [
-                OperatorEnum::OPERATION_MAPPING[$query['operation']] => $query['value'][0]
+            $condition['column'] => [
+                OperatorEnum::OPERATION_MAPPING[$condition['operation']] => $condition['value'][0]
             ]
         ];
 
-        if($query['sub_operation'] == SubOperatorEnum::AND){
-
+        if($condition['sub_operation'] == SubOperatorEnum::AND){
+            // add current element to -and elements-
+            $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
+            
             // if($this->responseOrElements){
             //     if($this->responseAndElements){
-            //         // add current element to and elements
-            //         $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
-    
-            //         $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
-            //         // $this->responseAndElements = [];
+            //         array_pop($this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']]);
             //     }
-            //     else{
-            //         $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
 
-            //         $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseElement;
-            //     }
-            // }
-            // else{
-                $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
+            //     $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
             // }
         }
 
-        elseif($query['sub_operation'] == SubOperatorEnum::OR){
-            if($this->responseAndElements){
-                // add current element to and elements
-                $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
-
-                $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
-                $this->responseAndElements = [];
-            }
-            else{
-                $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseElement;
-            }
+        elseif($condition['sub_operation'] == SubOperatorEnum::OR){
+            $this->addToOrElements();
         }
-        elseif($query['sub_operation'] == null){
+
+        elseif($condition['sub_operation'] == null){
             if($this->responseOrElements){
-                if($this->responseAndElements){
-                    // add current element to and elements
-                    $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
-    
-                    $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
-                    $this->responseAndElements = [];
-                }
-                else{
-                    $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseElement;
-                }
+                $this->addToOrElements();
+
             }
             elseif($this->responseAndElements){
-                // add current element to and elements
+                // add current element to -and elements-
                 $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
-                $this->responseAndElements = [];
             }
         }
 
+    }
+
+
+
+
+
+    private function addToOrElements(){
+        if($this->responseAndElements){
+            // add current element to -and elements-
+            $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
+            // if there is -and elements- we need to append the updated one after adding current element
+            // so we replace the old one with the updated one
+            // if(!empty($this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']])){
+            //     array_pop($this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']]);
+            // }
+            // add -and elements- to the -or elemments-
+            $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
+            // clear -and elements- (because the sub_opration is or, so this element
+            // would be the last elemnt in the current -and elements-)
+            $this->responseAndElements = [];
+        }
+        // if there is no -and elements- so just add current element to -or elements-
+        else{
+            $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseElement;
+        }
     }
 
 }

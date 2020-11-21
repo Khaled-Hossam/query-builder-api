@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\GeneratingQueryFormRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\GeneratingQueryFormRequest;
 use App\Services\GeneratingQueryService;
-use Illuminate\Http\Request;
 
 class QueryController extends Controller
 {
     /**
      * Handle the incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\GeneratingQueryFormRequest  $request
      * @return \Illuminate\Http\Response
      */
     public function __invoke(
@@ -19,10 +19,15 @@ class QueryController extends Controller
         GeneratingQueryService $generatingQueryService
     )
     {
-        // dd($request->validated());
-        // $content = file_get_contents($request->file('input')->getRealPath() );
-        // dd(json_decode( $content, true) );
         $result = $generatingQueryService->execute($request->validated());
+
+        if($result == false){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'file doesn\'t have valid data'
+            ], 422);
+        }
+        
         return response()->json($result);
     }
 }

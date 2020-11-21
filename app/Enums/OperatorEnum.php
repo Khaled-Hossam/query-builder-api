@@ -13,6 +13,8 @@ class OperatorEnum
     const GREATER_THAN_OR_EQUAL = 'greater_than_or_equal';
     const LESS_THAN_OR_EQUAL = 'less_than_or_equal';
 
+    // the key is : the oprator which come as input 
+    // and the value : is the corresponding oprator whcih will be returned in the final output
     const OPERATION_MAPPING = [
         self::IS_EQUAL => '$eq',
         self::NOT_EQUAL => '$ne',

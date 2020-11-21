@@ -18,4 +18,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('generate-query', 'QueryController')->name('generate_query');
+Route::post('generate-query', 'Api\QueryController')->name('generate_query');
