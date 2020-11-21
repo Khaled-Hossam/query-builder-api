@@ -70,7 +70,7 @@ You can now access the server at http://localhost:8000
 
 Generating query api
 
-    /api/generate-query
+    post /api/generate-query
 
 Request headers
 
