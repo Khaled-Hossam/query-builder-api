@@ -61,14 +61,6 @@ class GeneratingQueryService{
         if($condition['sub_operation'] == SubOperatorEnum::AND){
             // add current element to -and elements-
             $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
-            
-            // if($this->responseOrElements){
-            //     if($this->responseAndElements){
-            //         array_pop($this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']]);
-            //     }
-
-            //     $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
-            // }
         }
 
         elseif($condition['sub_operation'] == SubOperatorEnum::OR){
@@ -96,13 +88,10 @@ class GeneratingQueryService{
         if($this->responseAndElements){
             // add current element to -and elements-
             $this->responseAndElements[SubOperatorEnum::OPERATION_MAPPING['and']][] = $this->responseElement;
-            // if there is -and elements- we need to append the updated one after adding current element
-            // so we replace the old one with the updated one
-            // if(!empty($this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']])){
-            //     array_pop($this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']]);
-            // }
+
             // add -and elements- to the -or elemments-
             $this->responseOrElements[SubOperatorEnum::OPERATION_MAPPING['or']][] = $this->responseAndElements;
+            
             // clear -and elements- (because the sub_opration is or, so this element
             // would be the last elemnt in the current -and elements-)
             $this->responseAndElements = [];
